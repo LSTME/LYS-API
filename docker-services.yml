@@ -1,0 +1,47 @@
+mysql_base:
+    build: docker/source/mysql
+    ports:
+        - "0.0.0.0:53306:3306"
+    tty: true
+    hostname: mysql-host
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+    volumes:
+        - "/var/volumes/lstme/mysqldata/:/var/lib/mysql"
+
+code_base:
+    build: docker/source/code
+    hostname: code-host
+
+php_dev_base:
+    build: docker/source/php_dev
+    tty: true
+    hostname: php-dev-host
+    working_dir: /var/www/lstme
+
+php_cli_base:
+    build: docker/source/php_cli
+    tty: true
+    hostname: php-cli-host
+    working_dir: /var/www/lstme
+
+nginx_base:
+    build: docker/source/nginx_api
+    tty: true
+    hostname: nginx-host-api
+    environment:
+        PHPFPM_HOST: php-dev-host
+        PHPFPM_PORT: 9000
+        SYMFONY_SERVERNAME: lys.api.dev
+        SYMFONY_ROOT: /var/www/lstme/web
+    ports:
+        - "50088:80"
+    volumes:
+        - "/var/volumes/lstme-logs/nginx_api/:/var/log/nginx"
+
+phpmyadmin:
+    build: docker/source/phpmyadmin
+    tty: true
+    hostname: phpmyadmin-host
+    ports:
+        - "58080:80"

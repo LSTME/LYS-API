@@ -1,0 +1,52 @@
+lyscodeapi:
+    extends:
+        file: docker-services.yml
+        service: code_base
+    volumes:
+        - ".:/var/www/lstme"
+    container_name: code-api-lys
+
+lysphpapi:
+    extends:
+        file: docker-services.yml
+        service: php_dev_base
+    volumes_from:
+        - lyscodeapi
+    links:
+        - lysmysql
+    container_name: php-api-lys
+
+lysphpcliapi:
+    extends:
+        file: docker-services.yml
+        service: php_cli_base
+    volumes_from:
+        - lyscodeapi
+    hostname: php-cli
+    links:
+        - lysmysql
+    container_name: php-cli-api-lys
+
+lysmysql:
+    extends:
+        file: docker-services.yml
+        service: mysql_base
+    container_name: mysql-lys
+
+lysnginxapi:
+    extends:
+        file: docker-services.yml
+        service: nginx_base
+    volumes_from:
+        - lyscodeapi
+    links:
+        - lysphpapi
+    container_name: nginx-api-lys
+
+lysphpmyadmin:
+    extends:
+        file: docker-services.yml
+        service: phpmyadmin
+    links:
+        - lysmysql:db
+    container_name: phpmyadmin-lys

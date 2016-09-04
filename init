@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root (sudo)"
+    exit
+fi
+
+if [ ${SUDO_USER} -eq "root" ]; then
+    echo "You need to run as sudo with regular user; not sudo su"
+    exit
+fi
+
+echo -e "\e[30;48;5;82m APPENDING HOSTS \e[0m"
+
+if ! grep -q lys.api.dev /etc/hosts; then
+	echo "127.0.0.1 lys.api.dev" >> /etc/hosts
+fi
+
+echo -e "\e[30;48;5;82m INSTALLING COMPOSER \e[0m"
+sudo -u ${SUDO_USER} composer install --ignore-platform-reqs
+
+echo -e "\e[30;48;5;82m STARTING DOCKER CONTAINERS \e[0m"
+./docker/bin/dev_up
+
+echo -e "\e[30;48;5;82m ACCESS API AT: lys.api.dev:50088 \e[0m"
+echo -e "\e[30;48;5;82m ACCESS PHPMYADMIN AT: localhost:58080 \e[0m"
