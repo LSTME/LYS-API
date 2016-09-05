@@ -1,3 +1,3 @@
 FROM busybox:latest
 
-VOLUME /var/www/ledcoin
+VOLUME /var/www/lstme
